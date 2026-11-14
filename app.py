@@ -326,7 +326,7 @@ with tabs[1]:
 # --------------------------------------------------------------------------- graph
 def render_graph(g, edges_df, assets_df, highlight_path=None, choke=None, height=620):
     net = Network(height=f"{height}px", width="100%", directed=True, cdn_resources="remote",
-                  bgcolor=C["bg"], font_color=C["text"])
+                  bgcolor=C["bg"])   # no global font_color: it would override per-node fonts
     choke = set(choke or [])
     hp = set(zip(highlight_path, highlight_path[1:])) if highlight_path else set()
     flows = nx.DiGraph(list(zip(edges_df["source"], edges_df["target"])))
@@ -360,7 +360,7 @@ def render_graph(g, edges_df, assets_df, highlight_path=None, choke=None, height
         "physics": {"enabled": False},
         "edges": {"arrows": {"to": {"enabled": True, "scaleFactor": 0.6}},
                   "smooth": {"type": "cubicBezier", "forceDirection": "horizontal"}},
-        "interaction": {"hover": True, "navigationButtons": True, "zoomView": True}}))
+        "interaction": {"hover": True, "zoomView": True, "dragView": True}}))
     page = net.generate_html()
     # Fit the whole network into view once drawn, and blend the frame into the dark theme
     page = page.replace(
