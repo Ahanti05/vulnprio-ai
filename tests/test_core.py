@@ -94,3 +94,15 @@ def test_min_cut_and_greedy_plan(tiny):
     assert ag.minimum_cut(a.graph) in ({"web"}, {"db"})
     plan = greedy_fix_plan(tiny.assets, tiny.edges, a.findings, k=2)
     assert plan.iloc[0]["risk_removed_pct"] == 100.0
+
+
+def test_attack_technique_mapping(tiny):
+    from vulnprio.attack import technique_for_finding, technique_for_step
+    assert technique_for_step(True, False) == "T1190"
+    assert technique_for_step(False, False) == "T1210"
+    assert technique_for_step(False, True) == "T1203"
+    assert technique_for_finding(False, "internal", None) == "T1068"
+    a = run_analysis(tiny)
+    assert a.graph["INTERNET"]["web"]["technique"] == "T1190"
+    assert a.graph["app"]["db"]["technique"] == "T1210"
+    assert all(len(p.techniques) == len(p.nodes) - 1 for p in a.paths)

@@ -1,5 +1,7 @@
 # 🛡️ VulnPrio AI
 
+![python](https://img.shields.io/badge/python-3.9%2B-blue) ![license](https://img.shields.io/badge/use-defensive%20only-red)
+
 ### AI-Based Vulnerability Prioritization & Attack-Path Analysis
 *A context-aware approach to cybersecurity risk assessment and remediation*
 
@@ -22,9 +24,11 @@ B.Tech CSE final-year major project · PVPIT Budhgaon, Sangli · DBATU · 2026�
 - **Attack graph:** NetworkX model of how an attacker could move from the Internet to crown-jewel assets
 - **Most-likely attack paths**, **choke points** (minimum node cut) and **what-if fix simulation**
 - **Graph-aware "Fix First" plan:** a greedy optimiser that picks the fixes that cut the most risk
+- **MITRE ATT&CK mapping:** every attack step is labelled with the matching technique (T1190, T1210, T1203, T1068)
+- **REST API backend (FastAPI):** findings, attack paths, what-if, fix plan and model metrics as JSON, with Swagger docs at `/docs`
 - **Built-in evaluation** against a CVSS-only baseline
 - **Beginner-friendly dashboard** (Streamlit, dark security theme): 8 plain-English tabs, a 4-step explainer, a glossary, an interactive attack map, what-if fixes, and CSV upload/export
-- Unit-tested with pytest
+- 14 automated tests (engine + API) · Docker image · one-click Render deployment
 
 ## 📈 Results so far
 **AI model:** trained on CVEs from 2019–2020 and tested on 18,544 *unseen* CVEs from 2021 (202 later known exploited):
@@ -58,6 +62,8 @@ flowchart LR
   S --> R[Fix-First plan<br/>what-if simulation]
   G --> R
   S --> UI[Streamlit dashboard]
+  S --> API[FastAPI REST API]
+  R --> API
   R --> UI
   X --> UI
 ```
@@ -71,6 +77,32 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 The sample data and trained model are included, so the dashboard works offline straight away.
+
+### Backend API
+```bash
+uvicorn api:app --reload        # then open http://localhost:8000/docs
+```
+| Endpoint | What it returns |
+|---|---|
+| `GET /summary` | headline numbers: attack paths, exposed crown jewels, risk |
+| `GET /findings` | ranked findings with reasons (`?kev_only=true`, `?limit=`) |
+| `POST /findings/score` | re-rank with custom weights |
+| `GET /attack-paths` | most likely paths with CVEs and MITRE ATT&CK techniques |
+| `GET /choke-points` | choke points and minimum cut |
+| `POST /what-if` | before/after risk for a set of fixes |
+| `GET /fix-plan` | greedy graph-aware remediation plan |
+| `GET /evaluation` | CVSS-only vs contextual vs graph-aware after *k* fixes |
+| `GET /model` | AI model metrics and top features |
+
+### Deploy (free) on Render
+`render.yaml` deploys **both** services: Render → *New* → *Blueprint* → select this repo → *Apply*.
+
+### Docker
+```bash
+docker build -t vulnprio-ai .
+docker run -p 8501:8501 vulnprio-ai                                  # dashboard
+docker run -p 8000:8000 vulnprio-ai uvicorn api:app --host 0.0.0.0    # API
+```
 
 ### Rebuild everything from live data (optional)
 ```bash
@@ -92,8 +124,10 @@ vulnprio/
   graph.py     attack graph, paths, choke points, risk metrics
   remediation.py  what-if, greedy fix plan, strategy comparison
   ml/model.py  AI exploit-likelihood model
+  attack.py    MITRE ATT&CK technique mapping
   analysis.py  end-to-end pipeline
-app.py         Streamlit dashboard
+app.py         Streamlit dashboard (frontend)
+api.py         FastAPI REST API (backend)
 scripts/       data download, training, evaluation
 data/sample/   synthetic company network + CVE snapshot
 models/        trained model + metrics

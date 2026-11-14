@@ -19,6 +19,7 @@ import math
 
 import pandas as pd
 
+from .attack import technique_for_finding
 from .config import (CRITICALITY, DEFAULT_WEIGHTS, EPSS_BLEND, EXPOSURE, LOCAL_PATH_FACTOR,
                      ML_BLEND, NETWORK_VECTORS)
 
@@ -75,6 +76,12 @@ def add_exploit_factor(findings: pd.DataFrame) -> pd.DataFrame:
     f["high_impact"] = [enables_compromise(c, i) for c, i in zip(f["conf_impact"], f["integ_impact"])]
     # network_exploitable = can be used as a step in an attack path
     f["network_exploitable"] = f["remote"] & f["high_impact"]
+    if "user_interaction" not in f:
+        f["user_interaction"] = None
+    f["attack_technique"] = [technique_for_finding(r, e, u) for r, e, u in
+                             zip(f["remote"],
+                                 f["exposure"] if "exposure" in f else ["internal"] * len(f),
+                                 f["user_interaction"])]
     f["f_exploit"] = [exploit_likelihood(k, e, m) for k, e, m in
                       zip(f["in_kev"], f["epss_percentile"], f["ml_percentile"])]
     return f

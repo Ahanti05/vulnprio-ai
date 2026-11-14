@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import html
 import json
+import os
 
 import networkx as nx
 import pandas as pd
@@ -11,6 +12,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 from pyvis.network import Network
 
+from vulnprio import attack
 from vulnprio import graph as ag
 from vulnprio.analysis import run_analysis
 from vulnprio.config import DEFAULT_WEIGHTS, ENTRY_NODE, SAMPLE_DIR
@@ -135,11 +137,12 @@ GLOSSARY = """
 | **Attack path** | A chain of hops a hacker could take, e.g. Internet → web server → database. |
 | **Choke point** | An asset that many attack paths pass through. Securing it blocks many paths at once. |
 | **Risk score (0–100)** | Our combined score. Higher means fix it sooner. |
-| **AI exploit predictor** | A model trained on 54,000 real CVEs that guesses which bugs hackers will use. |
+| **AI exploit predictor** | A model trained on real CVEs that guesses which bugs hackers will use. |
+| **MITRE ATT&CK** | The industry's standard list of hacker techniques, e.g. *T1190 Exploit Public-Facing Application*. |
 """
 
 
-def path_html(nodes, cves=None):
+def path_html(nodes, cves=None, techniques=None):
     parts = []
     for i, n in enumerate(nodes):
         cls = "entry" if i == 0 else ("target" if i == len(nodes) - 1 else "")
@@ -147,7 +150,14 @@ def path_html(nodes, cves=None):
         if i < len(nodes) - 1:
             parts.append('<span class="arrow">→</span>')
     cve_line = f'<div class="cve" style="margin-top:8px">via {", ".join(cves)}</div>' if cves else ""
-    return f'<div class="path">{"".join(parts)}</div>{cve_line}'
+    tech_line = ""
+    if techniques:
+        chips = " → ".join(
+            f'<a href="{attack.url(t)}" target="_blank" title="{attack.tactic(t)}" '
+            f'style="color:{C["violet"]};text-decoration:none">{t} {attack.name(t)}</a>'
+            for t in techniques if t)
+        tech_line = f'<div class="cve" style="margin-top:4px">MITRE ATT&amp;CK: {chips}</div>'
+    return f'<div class="path">{"".join(parts)}</div>{cve_line}{tech_line}'
 
 
 # --------------------------------------------------------------------------- data
@@ -185,6 +195,9 @@ with st.sidebar:
     with st.expander("📖 Glossary: what do these words mean?"):
         st.markdown(GLOSSARY)
     st.divider()
+    api_url = os.environ.get("VULNPRIO_API_URL", "").rstrip("/")
+    if api_url:
+        st.markdown(f"🔌 **Backend API:** [{api_url}/docs]({api_url}/docs)")
     st.caption("B.Tech CSE Major Project · PVPIT Budhgaon · DBATU · 2026–27")
 
 if dataset is None:
@@ -232,6 +245,7 @@ COLS = {
     "f_path": st.column_config.ProgressColumn("Path share", min_value=0, max_value=1, format="%.2f"),
     "contextual_score": st.column_config.ProgressColumn("Risk score", min_value=0, max_value=100, format="%.1f"),
     "explanation": st.column_config.TextColumn("Why", width="large"),
+    "attack_technique": st.column_config.TextColumn("ATT&CK", help="MITRE ATT&CK technique for exploiting this bug"),
 }
 
 tabs = st.tabs(["🏠 Overview", "📋 What to fix first", "🕸️ How attackers get in", "🧪 Try a fix",
@@ -271,7 +285,7 @@ with tabs[0]:
         if analysis.paths:
             p = analysis.paths[0]
             st.markdown(f'<div class="card"><h4>Most likely attack path · p = {p.probability:.3f}</h4>'
-                        f'{path_html(p.nodes, p.cves)}</div>', unsafe_allow_html=True)
+                        f'{path_html(p.nodes, p.cves, p.techniques)}</div>', unsafe_allow_html=True)
         cut = analysis.choke.loc[analysis.choke["in_min_cut"], "asset_id"].tolist()
         if cut:
             st.markdown(f'<div class="card"><h4>Choke points (minimum cut)</h4>'
@@ -309,7 +323,7 @@ with tabs[1]:
             "cvss_score", "attack_vector", "epss", "in_kev"]
     if "ml_probability" in view:
         cols.append("ml_probability")
-    cols += ["f_path", "contextual_score", "cvss_rank", "rank_shift", "explanation"]
+    cols += ["attack_technique", "f_path", "contextual_score", "cvss_rank", "rank_shift", "explanation"]
     st.dataframe(view[cols], column_config=COLS, hide_index=True, width="stretch", height=480)
     st.download_button("⬇ Export Fix-First list (CSV)", view[cols].drop(columns=["nvd"])
                        .assign(cve_id=view["cve_id"]).to_csv(index=False), "fix_first.csv", "text/csv")
@@ -350,7 +364,7 @@ def render_graph(g, edges_df, assets_df, highlight_path=None, choke=None, height
             d = g[u][v]
             on = (u, v) in hp
             net.add_edge(u, v, color=C["amber"] if on else "rgba(244,63,94,0.75)", width=5 if on else 2,
-                         title=f"Attack step p={d['prob']:.2f}\nvia {', '.join(d['cves'])}")
+                         title=f"Attack step p={d['prob']:.2f}\n{attack.label(d.get('technique', ''))}\nvia {', '.join(d['cves'])}")
         else:
             net.add_edge(u, v, color="rgba(141,151,181,0.25)", dashes=True, width=1,
                          title=f"Network flow (port {e.get('port')}): no exploitable vulnerability")
@@ -393,7 +407,7 @@ with tabs[2]:
         choice = st.selectbox("Highlight an attack path (most likely first)", labels)
         chosen = paths[labels.index(choice)]
         sel = chosen.nodes
-        st.markdown(f'<div class="card">{path_html(chosen.nodes, chosen.cves)}</div>',
+        st.markdown(f'<div class="card">{path_html(chosen.nodes, chosen.cves, chosen.techniques)}</div>',
                     unsafe_allow_html=True)
     else:
         st.success("No modelled attack path reaches a crown jewel.")

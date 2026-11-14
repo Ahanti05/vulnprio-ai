@@ -18,6 +18,7 @@ from dataclasses import dataclass
 import networkx as nx
 import pandas as pd
 
+from .attack import needs_user, technique_for_step
 from .config import ENTRY_NODE, MAX_PATHS, MAX_STEP_PROB, MIN_STEP_PROB, PATH_CUTOFF
 
 
@@ -26,6 +27,7 @@ class PathResult:
     nodes: list
     probability: float
     cves: list
+    techniques: list = None   # MITRE ATT&CK technique per hop
 
 
 def build_attack_graph(assets: pd.DataFrame, edges: pd.DataFrame, findings: pd.DataFrame,
@@ -39,18 +41,22 @@ def build_attack_graph(assets: pd.DataFrame, edges: pd.DataFrame, findings: pd.D
                    role=a.get("role", ""))
 
     live = findings[~findings["finding_id"].isin(patched) & findings["network_exploitable"]]
-    best = {}   # asset -> (prob, [cves])
+    best = {}   # asset -> (prob, [cves], [finding ids], user action required?)
     for asset_id, grp in live.groupby("asset_id"):
         p = min(MAX_STEP_PROB, max(MIN_STEP_PROB, float(grp["f_exploit"].max())))
+        ui = grp["user_interaction"] if "user_interaction" in grp else [None] * len(grp)
+        # The step needs a user only if *every* usable CVE on the target needs one
+        user_required = all(needs_user(x) for x in ui)
         best[asset_id] = (p, sorted(grp["cve_id"].unique().tolist()),
-                          sorted(grp["finding_id"].unique().tolist()))
+                          sorted(grp["finding_id"].unique().tolist()), user_required)
 
     for e in edges.to_dict("records"):
         v = e["target"]
         if v in best:
-            p, cves, fids = best[v]
+            p, cves, fids, user_required = best[v]
             g.add_edge(e["source"], v, prob=p, weight=-math.log(p), cves=cves,
-                       finding_ids=fids, port=e.get("port"), protocol=e.get("protocol"))
+                       finding_ids=fids, port=e.get("port"), protocol=e.get("protocol"),
+                       technique=technique_for_step(e["source"] == ENTRY_NODE, user_required))
     return g
 
 
@@ -73,11 +79,12 @@ def enumerate_paths(g: nx.DiGraph, cutoff: int = PATH_CUTOFF,
     if not targets:
         return results
     for nodes in nx.all_simple_paths(g, ENTRY_NODE, targets, cutoff=cutoff):
-        cves = []
+        cves, techniques = [], []
         for u, v in zip(nodes, nodes[1:]):
             cves.extend(g[u][v]["cves"])
+            techniques.append(g[u][v].get("technique"))
         results.append(PathResult(nodes=nodes, probability=path_probability(g, nodes),
-                                  cves=sorted(set(cves))))
+                                  cves=sorted(set(cves)), techniques=techniques))
         if len(results) >= max_paths:
             break
     results.sort(key=lambda r: r.probability, reverse=True)

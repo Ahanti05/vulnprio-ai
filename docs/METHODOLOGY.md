@@ -46,7 +46,17 @@ sensitivity study; the dashboard lets you change them live.
 - Split by **time** (train on older CVEs, test on newer) to avoid look-ahead.
 - Metrics: ROC-AUC, PR-AUC, Precision@100, compared with a CVSS-only baseline.
 
-## 6. Assumptions and limitations
+## 6. MITRE ATT&CK mapping
+| Situation | Technique | Tactic |
+|---|---|---|
+| Step from the Internet, no user action | T1190 Exploit Public-Facing Application | Initial Access |
+| Step needing a user action (email, document, web page) | T1203 Exploitation for Client Execution | Execution |
+| Step between internal assets, no user action | T1210 Exploitation of Remote Services | Lateral Movement |
+| Local-only vulnerability | T1068 Exploitation for Privilege Escalation | Privilege Escalation |
+
+User interaction comes from the CVSS vector (UI:N / UI:R; v4 P/A). A step needs a user only if every usable CVE on the target needs one.
+
+## 7. Assumptions and limitations
 - The demo network is synthetic; real organisational data may differ.
 - An attack edge is a modelled possibility, not a confirmed exploit.
 - Local-only CVEs do not create network edges (privilege escalation is out of scope for v1).
