@@ -1,0 +1,40 @@
+source,target,port,protocol,description
+INTERNET,web-01,443,https,Public website
+INTERNET,vpn-01,443,https,VPN login portal
+INTERNET,mail-01,443,https,Outlook Web Access
+INTERNET,mft-01,443,https,Partner file transfer
+web-01,app-01,8080,http,Reverse proxy to portal backend
+web-01,app-02,8009,ajp,Reverse proxy to reporting (AJP)
+vpn-01,ws-01,3389,rdp,VPN users reach office network
+vpn-01,ws-02,3389,rdp,VPN users reach office network
+vpn-01,wiki-01,443,https,VPN users reach intranet
+vpn-01,jenkins-01,8080,http,VPN users reach CI server
+mail-01,ws-01,0,email,Email delivered to Outlook
+mail-01,ws-02,0,email,Email delivered to Outlook
+mail-01,ws-03,0,email,Email delivered to Outlook
+mft-01,file-01,445,smb,Partner uploads copied to file share
+app-01,db-01,5432,postgres,Portal reads customer data
+app-02,db-01,5432,postgres,Reporting reads customer data
+jenkins-01,app-01,22,ssh,Deploy to portal
+jenkins-01,app-02,22,ssh,Deploy to reporting
+wiki-01,jenkins-01,8080,http,Links and webhooks to CI
+ws-01,file-01,445,smb,Shared drives
+ws-02,file-01,445,smb,Shared drives
+ws-03,file-01,445,smb,Shared drives
+ws-03,hr-db,1433,mssql,HR application
+ws-01,print-01,445,smb,Printing
+ws-02,print-01,445,smb,Printing
+ws-03,print-01,445,smb,Printing
+ws-01,dc-01,445,smb,Domain logon
+ws-02,dc-01,445,smb,Domain logon
+ws-03,dc-01,445,smb,Domain logon
+ws-01,admin-ws,3389,rdp,IT support sessions
+file-01,dc-01,445,smb,Domain member
+print-01,dc-01,445,smb,Domain member
+admin-ws,dc-01,3389,rdp,Domain administration
+admin-ws,backup-01,22,ssh,Backup administration
+admin-ws,db-01,5432,postgres,Database administration
+dc-01,hr-db,445,smb,Domain-joined server
+dc-01,file-01,445,smb,Domain-joined server
+dev-ws,jenkins-01,8080,http,Developer access to CI
+dev-ws,app-01,22,ssh,Developer SSH access

@@ -1,0 +1,122 @@
+{
+  "metrics": {
+    "train_size": 35627,
+    "train_positives": 275,
+    "test_size": 18544,
+    "test_positives": 202,
+    "split": "train: published before 2021-01-01; test: on/after 2021-01-01",
+    "model": {
+      "roc_auc": 0.8411,
+      "pr_auc": 0.0838,
+      "precision_at_100": 0.18
+    },
+    "cvss_only_baseline": {
+      "roc_auc": 0.719,
+      "pr_auc": 0.0233,
+      "precision_at_100": 0.04
+    },
+    "random_baseline_pr_auc": 0.0109
+  },
+  "top_features": [
+    {
+      "feature": "word: webmail",
+      "weight": 4.168
+    },
+    {
+      "feature": "word: salt",
+      "weight": 3.948
+    },
+    {
+      "feature": "word: commands root",
+      "weight": 3.689
+    },
+    {
+      "feature": "vendor_treck",
+      "weight": 3.648
+    },
+    {
+      "feature": "word: social",
+      "weight": 3.605
+    },
+    {
+      "feature": "vendor_qnap",
+      "weight": 3.594
+    },
+    {
+      "feature": "word: items",
+      "weight": 3.582
+    },
+    {
+      "feature": "vendor_fortinet",
+      "weight": 3.445
+    },
+    {
+      "feature": "vendor_synacor",
+      "weight": 3.425
+    },
+    {
+      "feature": "word: dcs",
+      "weight": 3.156
+    },
+    {
+      "feature": "vendor_sophos",
+      "weight": 3.155
+    },
+    {
+      "feature": "word: 86",
+      "weight": 3.113
+    },
+    {
+      "feature": "word: anyconnect",
+      "weight": 3.087
+    },
+    {
+      "feature": "vendor_sonicwall",
+      "weight": 3.074
+    },
+    {
+      "feature": "word: web services",
+      "weight": 3.066
+    },
+    {
+      "feature": "word: pro",
+      "weight": 3.065
+    },
+    {
+      "feature": "word: jquery",
+      "weight": 3.042
+    },
+    {
+      "feature": "word: 43",
+      "weight": 3.034
+    },
+    {
+      "feature": "vendor_citrix",
+      "weight": 3.033
+    },
+    {
+      "feature": "word: aka",
+      "weight": 3.003
+    },
+    {
+      "feature": "word: internet explorer",
+      "weight": 2.978
+    },
+    {
+      "feature": "vendor_php",
+      "weight": 2.947
+    },
+    {
+      "feature": "word: remote code",
+      "weight": 2.864
+    },
+    {
+      "feature": "vendor_vmware",
+      "weight": 2.852
+    },
+    {
+      "feature": "word: setting",
+      "weight": 2.828
+    }
+  ]
+}

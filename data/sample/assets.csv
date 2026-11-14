@@ -1,0 +1,20 @@
+asset_id,hostname,role,os,zone,criticality,exposure,crown_jewel,description
+web-01,web-01.demo.local,Public web server,Ubuntu 20.04,DMZ,high,internet,False,Company website (Apache httpd)
+vpn-01,vpn-01.demo.local,Remote-access VPN,Pulse Connect Secure,DMZ,high,internet,False,Employee VPN gateway
+mail-01,mail-01.demo.local,Mail server,Windows Server 2016,DMZ,high,internet,False,Microsoft Exchange
+mft-01,mft-01.demo.local,Managed file transfer,Windows Server 2019,DMZ,medium,internet,False,MOVEit Transfer for partners
+app-01,app-01.demo.local,Customer portal backend,Ubuntu 22.04,App,high,internal,False,Java Spring app using Log4j
+app-02,app-02.demo.local,Reporting service,Ubuntu 20.04,App,medium,internal,False,Apache Tomcat with AJP connector
+wiki-01,wiki-01.demo.local,Internal wiki,Ubuntu 20.04,App,medium,internal,False,Atlassian Confluence
+jenkins-01,jenkins-01.demo.local,CI/CD server,Ubuntu 22.04,App,high,internal,False,Jenkins build and deploy server
+db-01,db-01.demo.local,Customer database,Ubuntu 22.04,Data,critical,internal,True,Customer records (PII)
+hr-db,hr-db.demo.local,HR database,Windows Server 2019,Data,critical,internal,True,Employee and payroll data
+backup-01,backup-01.demo.local,Backup server,Ubuntu 18.04,Data,critical,isolated,True,Nightly backups (restricted network)
+dc-01,dc-01.demo.local,Domain controller,Windows Server 2019,Core,critical,internal,True,Active Directory
+file-01,file-01.demo.local,File server,Windows Server 2008 R2,Core,medium,internal,False,Legacy SMB file shares
+print-01,print-01.demo.local,Print server,Windows Server 2019,Core,low,internal,False,Office print spooler
+ws-01,ws-01.demo.local,Employee workstation (Finance),Windows 10,Office,medium,internal,False,Outlook + Office
+ws-02,ws-02.demo.local,Employee workstation (Sales),Windows 10,Office,low,internal,False,Outlook + Office + Chrome
+ws-03,ws-03.demo.local,Employee workstation (HR),Windows 10,Office,medium,internal,False,Outlook + Office
+admin-ws,admin-ws.demo.local,IT admin workstation,Windows 7,Office,high,internal,False,Legacy admin jump box with RDP
+dev-ws,dev-ws.demo.local,Developer laptop,Ubuntu 22.04,Office,medium,internal,False,Developer machine
