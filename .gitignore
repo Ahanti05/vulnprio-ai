@@ -9,3 +9,4 @@ data/cache/
 data/ml/
 !data/ml/.gitkeep
 .github/workflows/
+.claude/

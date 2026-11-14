@@ -23,7 +23,7 @@ B.Tech CSE final-year major project · PVPIT Budhgaon, Sangli · DBATU · 2026�
 - **Most-likely attack paths**, **choke points** (minimum node cut) and **what-if fix simulation**
 - **Graph-aware "Fix First" plan:** a greedy optimiser that picks the fixes that cut the most risk
 - **Built-in evaluation** against a CVSS-only baseline
-- **Interactive dashboard** (Streamlit): 7 tabs, live weight sliders, interactive graph, CSV upload/export
+- **Beginner-friendly dashboard** (Streamlit, dark security theme): 8 plain-English tabs, a 4-step explainer, a glossary, an interactive attack map, what-if fixes, and CSV upload/export
 - Unit-tested with pytest
 
 ## 📈 Results so far
@@ -35,7 +35,9 @@ B.Tech CSE final-year major project · PVPIT Budhgaon, Sangli · DBATU · 2026�
 | PR-AUC | **0.084** | 0.023 |
 | Precision@100 | **18%** | 4% |
 
-The remediation experiment on the synthetic network is in [docs/RESULTS.md](docs/RESULTS.md).
+**Remediation (synthetic network):** fixing the top 5 findings removes **0%** of modelled crown-jewel risk with CVSS-only ranking vs **100%** with our contextual ranking. See [docs/RESULTS.md](docs/RESULTS.md).
+
+**Scalability:** a full analysis of 2,000 assets and 3,935 findings runs in **under 1 second** on a laptop. **Weight sensitivity:** the ranking stays stable across 300 random weight settings (mean Kendall's τ 0.70). See [docs/EXPERIMENTS.md](docs/EXPERIMENTS.md).
 *Network results are simulation-based; see limitations in [docs/METHODOLOGY.md](docs/METHODOLOGY.md).*
 
 ## 🏗️ Architecture
@@ -76,6 +78,7 @@ python scripts/build_ml_dataset.py --start 2019-01-01 --end 2021-12-07   # ~10 m
 python scripts/train_model.py --split 2021-01-01
 python scripts/fetch_intel.py --refresh        # live CVSS / EPSS / KEV for the sample findings
 python scripts/evaluate.py                     # writes docs/RESULTS.md
+python scripts/experiments.py                  # writes docs/EXPERIMENTS.md
 pytest -q
 ```
 Tip: set `NVD_API_KEY` (free from NVD) to download about 10× faster.
@@ -97,6 +100,15 @@ models/        trained model + metrics
 tests/         pytest unit tests
 docs/          methodology and results
 ```
+
+## 📚 Documentation
+| Doc | What's inside |
+|---|---|
+| [docs/METHODOLOGY.md](docs/METHODOLOGY.md) | Data sources, risk formula, attack-graph rules, AI model, limitations |
+| [docs/DIAGRAMS.md](docs/DIAGRAMS.md) | DFD level 0/1, use case, class, sequence, activity, ER and deployment diagrams |
+| [docs/RESULTS.md](docs/RESULTS.md) | CVSS-only vs contextual vs graph-aware remediation experiment |
+| [docs/EXPERIMENTS.md](docs/EXPERIMENTS.md) | Weight sensitivity and scalability benchmarks |
+| [docs/VIVA.md](docs/VIVA.md) | 2-minute demo script and 16 likely viva questions with answers |
 
 ## 🔒 Ethics and scope
 Defensive decision-support only. It never scans or exploits anything. The demo network is

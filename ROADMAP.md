@@ -17,21 +17,24 @@ Legend: ✅ done in this repo · 🔄 in progress · ⬜ planned
 | 9 | What-if fix simulation (before/after) | ✅ | Member D |
 | 10 | Greedy graph-aware "Fix First" plan | ✅ | Member C |
 | 11 | AI model: NLP exploit-likelihood (TF-IDF + Logistic Regression, KEV labels, time split) | ✅ | Member B |
-| 12 | Streamlit dashboard (7 tabs, interactive graph, CSV upload/export) | ✅ | Member A |
+| 12 | Beginner-friendly Streamlit dashboard (8 tabs, 4-step explainer, glossary, interactive attack map, CSV upload/export) | ✅ | Member A |
 | 13 | Unit tests (pytest) | ✅ | All |
 | 14 | First experiment: CVSS-only vs contextual vs graph-aware (docs/RESULTS.md) | ✅ | Member C |
 | 15 | Team understands and can demo every module | ⬜ | All |
-| 16 | Second synthetic network (bigger, different topology) to check results hold | ⬜ | Member A |
-| 17 | Weight sensitivity study (how rankings change with weights) | ⬜ | Member C |
-| 18 | Report chapters 1–5 + UML/DFD/ER diagrams | ⬜ | Member A + B |
-| 19 | Sem-7 presentation and demo | ⬜ | All |
+| 16 | Synthetic network generator (50–2,000 assets) for testing at scale | ✅ | Member A |
+| 17 | Weight sensitivity study (how rankings change with weights) | ✅ | Member C |
+| 18 | UML/DFD/ER/deployment diagrams (docs/DIAGRAMS.md) | ✅ | Member A + B |
+| 18b | Report chapters 1–5 | ⬜ | Member A + B |
+| 19 | Viva guide and demo script (docs/VIVA.md) | ✅ | All |
+| 20 | Sem-7 presentation and demo | ⬜ | All |
 
 ## Semester 8 — final 20% (depth, polish, publication)
 
 | # | Work package | Owner |
 |---|---|---|
+| 0 | Extend AI training data to 2019–2024 CVEs | Member B |
 | 1 | Stronger AI: XGBoost/LightGBM + SHAP explanations, compare with Logistic Regression | Member B |
-| 2 | Scalability study: synthetic graphs of 100 → 5,000 assets, time and memory charts | Member D |
+| 2 | Scalability study at larger scale (10k+ assets, denser graphs, charts); first benchmark done | Member D |
 | 3 | Real scanner input: OpenVAS/Nmap on the team's **own** lab VMs (authorised only) | Member A |
 | 4 | Map attack steps to MITRE ATT&CK techniques | Member D |
 | 5 | FastAPI backend + login (Admin / Analyst) | Member C |
